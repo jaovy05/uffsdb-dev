@@ -1,5 +1,3 @@
-#define FBUFFER 1 // flag controlar os includes
-
 #ifndef FMACROS // garante que macros.h não seja reincluída
    #include "macros.h"
 #endif

@@ -10,7 +10,7 @@
    #include "parser.h"
 #endif
 #include "y.tab.h"
-#define YY_NO_INPUT
+
 %}
 
 %option nounput

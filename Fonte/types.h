@@ -2,7 +2,9 @@
   #include "Utility.h"
 #endif
 
-#define FTYPES 1 // flag para identificar se types.h já foi incluída
+#ifndef FMACROS // garante que macros.h não seja reincluída
+   #include "macros.h"
+#endif
 
 struct fs_objects { // Estrutura usada para carregar fs_objects.dat
     char nome[TAMANHO_NOME_TABELA];      // Nome da tabela.

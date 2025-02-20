@@ -1,15 +1,6 @@
-#define FEXPRESSAO 1
-
-#define LOGICO 1
-#define RELACIONAL 2
-#define SINAL 3
-#define ARITIMETICO 4
-#define ABRE_PARENT 5
-#define FECHA_PARENT 6
-#define STRING 7
-#define OBJETO 8
-#define VALUE_NUMBER 9
-#define BOOLEANO 10
+#ifndef FMACROS // garante que macros.h não seja reincluída
+   #include "macros.h"
+#endif
 
 char precedArit(int id);
 int operador(int id);

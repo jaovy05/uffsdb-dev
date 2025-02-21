@@ -47,16 +47,7 @@
 #define DB_EXISTS 1
 #define DB_NOT_EXISTS 24
 
-
-// buffer.h
-#define FBUFFER 1 // flag controlar os includes
-
-// dictionary.h
-#define FDICTIONARY 1 // para testar se já foi incluída
-
-// Expressao.h
-#define FEXPRESSAO 1
-
+// ======== Expressao.h
 #define LOGICO 1
 #define RELACIONAL 2
 #define SINAL 3
@@ -68,19 +59,5 @@
 #define VALUE_NUMBER 9
 #define BOOLEANO 10
 
-// misc.h
-#define FMISC 1
-
-// sqlcommands.h
-#define FSQLCOMMANDS 1   // flag para garantir a não reinclusão
-
-// types.h
-#define FTYPES 1 // flag para identificar se types.h já foi incluída
-
-// Utility.h
-#define FUTILITY 1
-
-// /interface
-
-// lex.l
+// ======== lex.l
 #define YY_NO_INPUT

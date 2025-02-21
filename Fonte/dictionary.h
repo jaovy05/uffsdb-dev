@@ -1,3 +1,5 @@
+#define FDICTIONARY 1 // para testar se já foi incluída
+
 #ifndef FMACROS // garante que macros.h não seja reincluída
    #include "macros.h"
 #endif

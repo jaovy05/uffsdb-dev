@@ -1,3 +1,5 @@
+#define FBUFFER 1 // flag controlar os includes
+
 /**
 * estrutura do nodo da arvore b+
 **/

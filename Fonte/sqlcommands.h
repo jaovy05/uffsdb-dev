@@ -1,3 +1,5 @@
+#define FSQLCOMMANDS 1   // flag para garantir a não reinclusão
+
 #ifndef FMACROS // garante que macros.h não seja reincluída
    #include "macros.h"
 #endif

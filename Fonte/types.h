@@ -1,3 +1,5 @@
+#define FTYPES 1 // flag para identificar se types.h já foi incluída
+
 #ifndef FFUTILITY
   #include "Utility.h"
 #endif

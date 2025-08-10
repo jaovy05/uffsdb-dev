@@ -30,7 +30,7 @@ typedef struct column{ // Estrutura utilizada para inserir em uma tabela, exclui
 }column;
 
 typedef struct tupla {
-    unsigned int endereco;
+    unsigned int offset;
     column *column;
 }tupla;
 

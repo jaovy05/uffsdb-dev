@@ -56,22 +56,22 @@ void limparExpNodosInf(Lista *l){
   l->prim = l->ult = NULL;
 }
 
-char buscaTipoObjecto(inf_where *iw,Lista *t){
+char buscaTipoObjecto(inf_where *iw,tupla *tuple){
   char tipo = iw->id;
   if(iw->id == OBJETO){
-    char c = buscaColuna(t,(char *)iw->token)->tipoCampo;
+    char c = buscaColuna(tuple,(char *)iw->token)->tipoCampo;
     tipo = (c == 'S' || c == 'C') ? STRING : VALUE_NUMBER;
   }
   return tipo;
 }
 
-char validaExp(Lista *l,Lista *t){
+char validaExp(Lista *l,tupla *tuple){
     for(Nodo *i = l->prim; i; i = i->prox){
         inf_where *iw = (inf_where *)(i->inf);
-        char tipo1 = buscaTipoObjecto(iw,t);
+        char tipo1 = buscaTipoObjecto(iw, tuple);
         if(tipo1 != STRING && tipo1 != VALUE_NUMBER) continue;
         for(Nodo *j = i->prox; j; j = j->prox){
-            char tipo2 = buscaTipoObjecto((inf_where *)(j->inf),t);
+            char tipo2 = buscaTipoObjecto((inf_where *)(j->inf),tuple);
             if(tipo2 == LOGICO) break;
             if((tipo2 == STRING && tipo1 == VALUE_NUMBER) || (tipo2 == VALUE_NUMBER && tipo1 == STRING) ) return 0;
         }
@@ -79,8 +79,8 @@ char validaExp(Lista *l,Lista *t){
     return 1;
 }
 
-Lista *resArit(Lista *l,Lista *t){
-    if(!validaExp(l,t)){
+Lista *resArit(Lista *l,tupla *tuple){
+    if(!validaExp(l, tuple)){
         printf("Operação entre tipos diferentes inválida.\n");
         return NULL;
     }
@@ -88,19 +88,19 @@ Lista *resArit(Lista *l,Lista *t){
     for(Nodo *i = l->prim; i; i = i->prox){
         inf_where *iw = (inf_where *)(i->inf);
         if(iw->id == LOGICO || iw->id == RELACIONAL){
-            aritPosfixa(op,t,novaExp);
+            aritPosfixa(op, tuple ,novaExp);
             limparExpNodos(op);
             adcNodo(novaExp,novaExp->ult, (void *)novoTokenWhere(iw->token,iw->id));
         }
         else adcNodo(op,op->ult,i->inf);
     }
-    aritPosfixa(op,t,novaExp);
+    aritPosfixa(op, tuple ,novaExp);
     limparExpNodos(op);
     free(op); op = NULL;
     return novaExp;
 }
 
-void aritPosfixa(Lista *l,Lista *t,Lista *novaExp){
+void aritPosfixa(Lista *l,tupla *tuple,Lista *novaExp){
     int fechap = 0;
     Pilha *p = novaPilha();
     Lista *pos = novaLista(NULL);
@@ -128,7 +128,8 @@ void aritPosfixa(Lista *l,Lista *t,Lista *novaExp){
         inf_where *iw = (inf_where *)pop(p);
         if(iw->id != ABRE_PARENT) adcNodo(pos,pos->ult, (void *)novoTokenWhere(iw->token,iw->id));
     }
-    inf_where *iw = opArit(pos,t);
+    // Faria muito sentido a operação ser feita em um momento separado da aritmética pós-fixa
+    inf_where *iw = opArit(pos,tuple);
     adcNodo(novaExp,novaExp->ult,(void *)novoResWhere(iw->token,iw->id));
 
     while(fechap--) adcNodo(novaExp,novaExp->ult,
@@ -138,8 +139,12 @@ void aritPosfixa(Lista *l,Lista *t,Lista *novaExp){
     free(pos); pos = NULL;
 }
 
-inf_where *opArit(Lista *l,Lista *t){
-  substitui(l,t);
+inf_where *opArit(Lista *l,tupla *tuple){
+  /* 
+  * Esse substitui poderia ser movido um nivel acima,
+  * ele ficaria antes de opArit e reduziria um parametro.
+  */
+  substitui(l,tuple);
   if(l->tam == 1) return (inf_where *)(l->prim->inf);
   Pilha *p = novaPilha();
   for(Nodo *i = l->prim; i; i = i->prox){
@@ -176,12 +181,12 @@ inf_where *opArit(Lista *l,Lista *t){
   return iw;
 }
 
-void substitui(Lista *l,Lista *t){
+void substitui(Lista *l,tupla *tuple){
   for(Nodo *i = l->prim; i; i = i->prox){
     inf_where *iw = (inf_where *)(i->inf);
     //substituindo as colunas do where pelo seu valor na tupla
     if(iw->id == OBJETO){
-      column *c = buscaColuna(t,(char *)(iw->token));
+      column *c = buscaColuna(tuple,(char *)(iw->token));
       free(iw->token);
       iw->token = converter(c->tipoCampo,c->valorCampo);
       if(iw->token == COLUNA_NULL) iw->id = NULLA;
@@ -198,11 +203,10 @@ void substitui(Lista *l,Lista *t){
   }
 }
 
-column *buscaColuna(Lista *t,char *str){
-  for(Nodo *i = t->prim; i; i = i->prox){
-    column *ic = (column *)(i->inf);
-    if(strcmp(ic->nomeCampo,str) == 0) return ic;
-  }
+column *buscaColuna(tupla *tuple,char *str){
+  for(column *c = tuple->column; c; c = c->next)
+    if(!strcmp(c->nomeCampo,str)) return c;
+  
   return NULL;//nao pode chegar aqui pq a query já foi validada.
 }
 

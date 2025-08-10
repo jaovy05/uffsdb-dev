@@ -157,10 +157,11 @@ int verificaChaveFK(char *nomeTabela,column *c, char *nomeCampo, char *valorCamp
         /*
         * Pq ele percorre todas as tuplas para verificar ??????
         * o campo vai mudar de nome no select ??? ?
+        * alguém deveria arrumar isso...
         */
         for(int j = 0; j < bufferpoll[page].nrec; j++){
             for (int i = 0; i < objeto.qtdCampos; i++)
-                if (pagina[j].column[i].nomeCampo) {
+                if (pagina[j].column[i].nomeCampo[0]) {
                     column *c = &pagina[j].column[i];
                     if(objcmp(c->nomeCampo, attApt) == 0){
 
@@ -254,7 +255,7 @@ int verificaChavePK(char *nomeTabela, column *c, char *nomeCampo, char *valorCam
 
         for(j = 0; j < bufferpoll[page].nrec; j++){
             for(int i = 0; i < objeto.qtdCampos; i++){
-                if (pagina[j].column[i].nomeCampo) {
+                if (pagina[j].column[i].nomeCampo[0]) {
                     column *c = &pagina[j].column[i];
                     if (objcmp(c->nomeCampo, nomeCampo) == 0) {
                         if (c->tipoCampo == 'S') {
@@ -744,15 +745,13 @@ void printConsulta(Lista *proj, Lista *result){
     printf("\n %d Linha%s.\n", result->tam, result->tam == 1 ? "" : "s");
     }
 
-void adcResultado(Lista *resultado, Lista *tupla, int *indiceProj, int qtdColunasTab, int qtdColunasProj){
+void adcResultado(Lista *resultado, tupla *tuple, int *indiceProj, int qtdColunasTab, int qtdColunasProj){
     adcNodo(resultado, resultado->ult, (void *)novaLista(NULL));
     Lista *tuplaRes = (Lista *)(resultado->ult->inf);
     inf_where **listNw = (inf_where **)malloc(sizeof(inf_where *) * qtdColunasTab);
     int i = 0;
 
-    for(Nodo *n1 = tupla->prim; n1; n1 = n1->prox, i++){
-        column *c = (column *)(n1->inf);
-            
+    for(column *c = tuple->column; c; c = c->next, i++){
         inf_where *nw = malloc(sizeof(inf_where));
         nw->id = c->tipoCampo;
 
@@ -809,12 +808,11 @@ Lista *op_select(inf_select *select) {
         printf("ERROR: no memory available to allocate buffer.\n");
         return NULL;
     }
-    int tuplasLidas, erro = SUCCESS, tuplasRemovidas = 0;
-    for(tuplasLidas = 0; erro == SUCCESS || erro == ERRO_LEITURA_DADOS_DELETADOS; tuplasLidas++){
+    int tuplasLidas = 0, erro = SUCCESS;
+    while (erro == SUCCESS || erro == ERRO_LEITURA_DADOS_DELETADOS){
         erro = colocaTuplaBuffer(bufferpoll, tuplasLidas, esquema, objeto);
-        if(erro == ERRO_LEITURA_DADOS_DELETADOS) tuplasRemovidas++;
+        if(erro == SUCCESS) tuplasLidas++;
     }
-    tuplasLidas-= tuplasRemovidas + 1;
     tupla *pagina = getPage(bufferpoll, esquema, objeto, 0);
     if(!pagina){
         printf("Tabela vazia.\n");
@@ -840,7 +838,7 @@ Lista *op_select(inf_select *select) {
     int k;
     char abortar = 0;
     int qtdCamposProj =  ((char *)select->proj->prim->inf)[0] == '*' ? objeto.qtdCampos : select->proj->tam;
-    Lista *tupla = novaLista(NULL), *resultado = novaLista(NULL);
+    Lista *resultado = novaLista(NULL);
     for(int p = 0; !abortar && tuplasLidas; tuplasLidas -= bufferpoll[p++].nrec){
         pagina = getPage(bufferpoll, esquema, objeto, p);
         if(pagina == ERRO_PARAMETRO){
@@ -851,8 +849,7 @@ Lista *op_select(inf_select *select) {
             return NULL;
         }
         for(k = 0; !abortar && k < bufferpoll[p].nrec; k++){
-            for(int i = 0; i < objeto.qtdCampos; i++)
-                adcNodo(tupla, tupla->ult, (void *)(&pagina[k].column[i]));
+            tupla *tupla = &pagina[k];
             char sat = 0;
 
             if(select->tok){
@@ -865,20 +862,12 @@ Lista *op_select(inf_select *select) {
             }
             else sat = 1;
             if(!abortar && sat) adcResultado(resultado, tupla, indiceProj, objeto.qtdCampos, qtdCamposProj);
-
-            for(Nodo *n1 = tupla->prim, *n2; n1; n1 = n2){
-                n2 = n1->prox;
-                rmvNodoPtr(tupla, n1);
-                //não precisa dar free na informação
-                //pois é ponteiro pra pagina[j]
-            }
-            tupla->prim = tupla->ult = NULL;
         }
+        free(pagina);
     }
     if(abortar) resultado = NULL;
     
     free(indiceProj); indiceProj = NULL;
-    free(tupla); tupla = NULL;
     free(esquema); esquema = NULL;
     free(bufferpoll); bufferpoll = NULL;
     return resultado;

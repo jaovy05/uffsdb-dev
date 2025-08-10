@@ -2,6 +2,8 @@
   #include "Utility.h"
 #endif
 
+#include "base.h"
+
 #define FTYPES 1 // flag para identificar se types.h já foi incluída
 
 struct fs_objects { // Estrutura usada para carregar fs_objects.dat
@@ -31,6 +33,7 @@ typedef struct column{ // Estrutura utilizada para inserir em uma tabela, exclui
 
 typedef struct tupla {
     unsigned int offset;
+    uint ncols; // Número de colunas na tupla.
     column *column;
 }tupla;
 

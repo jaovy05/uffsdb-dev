@@ -80,7 +80,7 @@ tupla *getPage(tp_buffer *buffer, tp_table *campos, struct fs_objects objeto, in
             continue;
         }
         tuplas[indiceTupla].offset = i; 
-
+        tuplas[indiceTupla].ncols = objeto.qtdCampos;
         i++; //para o byte de deleted
         memcpy(nullos, buffer[page].data + i, objeto.qtdCampos);
         i += objeto.qtdCampos;

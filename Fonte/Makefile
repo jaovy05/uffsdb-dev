@@ -1,7 +1,9 @@
+LDLIBS = -lfl -lm -pthread -lreadline
+
 all: uffsdb
 
 uffsdb: interface/y.tab.c interface/y.tab.h interface/lex.yy.c *.c *.h
-	gcc *.c interface/*.c -lfl -lm -pthread -lreadline -o uffsdb -Wall -g
+	gcc *.c interface/*.c -Iinclude -Wall -g $(LDLIBS) -o uffsdb 
 
 interface/y.tab.c interface/y.tab.h: interface/lex.l interface/yacc.y
 	lex -o interface/lex.yy.c interface/lex.l

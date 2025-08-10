@@ -203,10 +203,10 @@ void substitui(Lista *l,tupla *tuple){
   }
 }
 
-column *buscaColuna(tupla *tuple,char *str){
-  for(column *c = tuple->column; c; c = c->next)
-    if(!strcmp(c->nomeCampo,str)) return c;
-  
+column *buscaColuna(tupla *tuple, char *str){
+  for(uint i = 0; i < tuple->ncols; i++)
+    if(!strcmp(tuple->column[i].nomeCampo,str)) return &tuple->column[i];
+
   return NULL;//nao pode chegar aqui pq a query já foi validada.
 }
 

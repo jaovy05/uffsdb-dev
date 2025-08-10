@@ -745,14 +745,14 @@ void printConsulta(Lista *proj, Lista *result){
     printf("\n %d Linha%s.\n", result->tam, result->tam == 1 ? "" : "s");
     }
 
-void adcResultado(Lista *resultado, tupla *tuple, int *indiceProj, int qtdColunasTab, int qtdColunasProj){
+void adcResultado(Lista *resultado, tupla *tuple, int *indiceProj, int qtdColunasProj){
     adcNodo(resultado, resultado->ult, (void *)novaLista(NULL));
     Lista *tuplaRes = (Lista *)(resultado->ult->inf);
-    inf_where **listNw = (inf_where **)malloc(sizeof(inf_where *) * qtdColunasTab);
-    int i = 0;
+    inf_where **listNw = (inf_where **)malloc(sizeof(inf_where *) * tuple->ncols);
 
-    for(column *c = tuple->column; c; c = c->next, i++){
+    for(uint i = 0; i < tuple->ncols; i++){
         inf_where *nw = malloc(sizeof(inf_where));
+        column *c = &tuple->column[i];
         nw->id = c->tipoCampo;
 
         if(c->valorCampo == (void *)COLUNA_NULL) nw->token = COLUNA_NULL;
@@ -861,7 +861,7 @@ Lista *op_select(inf_select *select) {
                 else abortar = 1;
             }
             else sat = 1;
-            if(!abortar && sat) adcResultado(resultado, tupla, indiceProj, objeto.qtdCampos, qtdCamposProj);
+            if(!abortar && sat) adcResultado(resultado, tupla, indiceProj, qtdCamposProj);
         }
         free(pagina);
     }

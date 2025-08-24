@@ -45,6 +45,7 @@
 #define SIZE 512                // Tamanho da página.
 #define PAGES 10                // Número de páginas.
 #define TAMANHO_NOME_CAMPO 40   // Tamanho do nome dos campos de uma tabela.
+#define TAMANHO_NOME_CONSTRAINT 40 // Tamanho do nome da constraint.
 #define TAMANHO_NOME_TABELA 20  // Tamanho do nome da tabela.
 #define TAMANHO_NOME_ARQUIVO 20 // Tamanho do nome do arquivo.
 #define TAMANHO_NOME_INDICE 40  // Tamanho do nome do arquivo de indice.

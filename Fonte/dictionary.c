@@ -191,12 +191,9 @@ char retornaTamanhoTipoDoCampo(char *nomeCampo, table  *tab) {
 
 tp_table *procuraAtributoFK(struct fs_objects objeto){
     FILE *schema;
-    int cod = 0, chave, i = 0;
-    char *tupla = (char *)malloc(sizeof(char) * 109);
+    int cod = 0, i = 0;
+    char *tupla = (char *)malloc(sizeof(char) * 111);
     tp_table *esquema = (tp_table *)malloc(sizeof(tp_table)*objeto.qtdCampos);
-    tp_table *vetEsqm = (tp_table *)malloc(sizeof(tp_table)*objeto.qtdCampos);
-    memset(vetEsqm, 0, sizeof(tp_table)*objeto.qtdCampos);
-    memset(esquema, 0, sizeof(tp_table)*objeto.qtdCampos);
 
     char directory[LEN_DB_NAME_IO];
     strcpy(directory, connected.db_directory);
@@ -206,7 +203,6 @@ tp_table *procuraAtributoFK(struct fs_objects objeto){
       printf("ERROR: could not read schema.\n");
       free(tupla);
 		  free(esquema);
-		  free(vetEsqm);
       return ERRO_ABRIR_ESQUEMA;
     }
 
@@ -220,32 +216,24 @@ tp_table *procuraAtributoFK(struct fs_objects objeto){
 
                 fread(&esquema[i].tipo , sizeof(char), 1 , schema);
                 fread(&esquema[i].tam  , sizeof(int) , 1 , schema);
-                fread(&chave, sizeof(int) , 1 , schema);
-                vetEsqm[i].tipo = esquema[i].tipo;
-                vetEsqm[i].tam = esquema[i].tam;
+                fread(&esquema[i].chave, sizeof(int) , 1 , schema);
+                fread(&esquema[i].idApt, sizeof(ushort), 1, schema);
                 fread(tupla, sizeof(char), TAMANHO_NOME_TABELA, schema);
                 strcpylower(esquema[i].tabelaApt,tupla);
 
                 fread(tupla, sizeof(char), TAMANHO_NOME_CAMPO, schema);
                 strcpylower(esquema[i].attApt,tupla);
 
-                strcpylower(vetEsqm[i].tabelaApt, esquema[i].tabelaApt);
-                strcpylower(vetEsqm[i].attApt, esquema[i].attApt);
-                strcpylower(vetEsqm[i].nome, esquema[i].nome);
-                vetEsqm[i].chave = chave;
-
                 i++;
             } else {
-                fseek(schema, 109, 1);
+                fseek(schema, 111, 1);
             }
         }
     }
     free(tupla);
-	free(esquema);
-
 	fclose(schema);
 
-    return vetEsqm;
+    return esquema;
 }
 
 struct fs_objects leObjeto(char *nTabela){
@@ -348,11 +336,11 @@ tp_table *leSchema (struct fs_objects objeto){
             if(cod == objeto.cod){ // Verifica se o campo a ser copiado e da tabela que esta na estrutura fs_objects.
                 fread(tupla, sizeof(char), TAMANHO_NOME_CAMPO, schema);
                 strcpylower(esquema[i].nome,tupla);                  // Copia dados do campo para o esquema.
-
+                esquema[i].id = cod;
                 fread(&esquema[i].tipo, sizeof(char),1,schema);
                 fread(&esquema[i].tam, sizeof(int),1,schema);
                 fread(&esquema[i].chave, sizeof(int),1,schema);
-
+                fread(&esquema[i].idApt, sizeof(ushort), 1, schema);
                 fread(tuplaT, sizeof(char), TAMANHO_NOME_TABELA, schema);
                 strcpylower(esquema[i].tabelaApt,tuplaT);
 
@@ -363,7 +351,7 @@ tp_table *leSchema (struct fs_objects objeto){
                 i++;
             }
             else {
-                fseek(schema, 109, 1); // Pula a quantidade de caracteres para a proxima verificacao (40B do nome, 1B do tipo e 4B do tamanho,4B da chave, 20B do nome da Tabela Apontada e 40B do atributo apontado).
+                fseek(schema, 111, 1); // Pula a quantidade de caracteres para a proxima verificacao (40B do nome, 1B do tipo e 4B do tamanho,4B da chave, 20B do nome da Tabela Apontada e 40B do atributo apontado).
             }
         }
     }
@@ -472,6 +460,39 @@ int tamTuplaSemByteControle(tp_table *esquema, struct fs_objects objeto) {// Ret
     return tamanhoGeral;
 }
 
+tp_table* verificaIntegridade(ushort idTabela ){
+    FILE *fp;
+    tp_table esquema, *fkColumns = NULL; // Aloca esquema com a quantidade de campos necessarios.
+    int cod;
+    char directory[LEN_DB_NAME_IO];
+    strcpy(directory, connected.db_directory);
+    strcat(directory, "fs_object.dat");
+
+    if((fp = fopen(directory,"a+b")) == NULL) {
+        return ERRO_ABRIR_ARQUIVO;
+    }
+
+     while((fgetc (fp) != EOF)){
+        fseek(fp, -1, 1);
+
+        fread(&esquema.id, sizeof(int), 1, fp);
+        fread(&esquema.nome , TAMANHO_NOME_CAMPO, 1 , fp);
+        fread(&esquema.tipo  , sizeof(char) , 1 , fp);
+        fread(&esquema.tam, sizeof(int) , 1 , fp);
+        fread(&esquema.chave, sizeof(int), 1, fp);
+        fread(&esquema.idApt, sizeof(ushort), 1, fp);
+        fread(&esquema.tabelaApt, TAMANHO_NOME_TABELA, 1, fp);
+        fread(&esquema.attApt, TAMANHO_NOME_CAMPO, 1, fp);
+        if(idTabela == esquema.idApt && esquema.chave == FK){
+            tp_table *e = (tp_table *)malloc(sizeof(tp_table));
+            memcpy(e, &esquema, sizeof(tp_table));
+            e->next = fkColumns;
+            fkColumns = e;
+        }
+    }
+	fclose(fp);
+    return fkColumns;
+}
 
 // CRIA TABELA
 table *iniciaTabela(char *nome){
@@ -568,6 +589,7 @@ int finalizaTabela(table *t){
         fwrite(&aux->tipo      ,sizeof(aux->tipo)      ,1,esquema);  //Tipo campo
         fwrite(&aux->tam       ,sizeof(aux->tam)       ,1,esquema);  //Tamanho campo
         fwrite(&aux->chave     ,sizeof(aux->chave)     ,1,esquema);  //Chave do campo
+        fwrite(&aux->idApt     ,sizeof(aux->idApt)    ,1,esquema);  //Tabela Apontada
         fwrite(&aux->tabelaApt ,sizeof(aux->tabelaApt) ,1,esquema);  //Tabela Apontada
         fwrite(&aux->attApt    ,sizeof(aux->attApt)    ,1,esquema);  //Atributo apontado.
 
@@ -595,6 +617,9 @@ int finalizaTabela(table *t){
     fwrite(&nomeArquivo,sizeof(nomeArquivo),1,dicionario);
     fwrite(&qtdCampos,sizeof(qtdCampos),1,dicionario);
     fwrite(&qtdIndice,sizeof(int),1,dicionario);
+
+    strcpy(directory, connected.db_directory);
+    strcat(directory, "fs_constraint.dat");
 
     fclose(dicionario);
     return SUCCESS;

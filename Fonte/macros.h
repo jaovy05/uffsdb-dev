@@ -1,3 +1,5 @@
+#pragma once
+
 #define FMACROS 0 // flag para identificar se macros.h já foi incluída
 // TRATAMENTO DE ERROS
 // ERROS inteiros
@@ -68,3 +70,4 @@
         do { } while (0)
 #endif
 
+#define MEMORY_CONTEXT_SIZE 16384 // 16 KB

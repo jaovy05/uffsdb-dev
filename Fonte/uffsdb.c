@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+
+#include "memoryContext.h"
 #ifndef FMACROS
    #include "macros.h"
 #endif

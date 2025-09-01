@@ -1,52 +1,49 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "memoryContext.h"
 
 #ifndef FUTILITY
    #include "Utility.h"
 #endif
 
 Nodo *novoNodo(void *inf){
-  Nodo *novo = malloc(sizeof(Nodo));
-  novo->inf = inf;
-  novo->ant = novo->prox = NULL;
-  return novo;
+    Nodo *novo = uffsloc(sizeof(Nodo));
+    novo->inf = inf;
+    novo->ant = novo->prox = NULL;
+    return novo;
 }
 
 Lista *novaLista(int (*cmp)(void *inf1,void *inf2)){
-  Lista *l = malloc(sizeof(Lista));
-  if(!l){
-    printf("Impossivel alocar lista!\n");
-    return NULL;
-  }
-  l->tam = 0;
-  l->cmp = cmp;
-  l->prim = l->ult = NULL;
-  return l;
+    Lista *l = uffsloc(sizeof(Lista));
+    l->tam = 0;
+    l->cmp = cmp;
+    l->prim = l->ult = NULL;
+    return l;
 }
 
 void adcNodo(Lista *l,Nodo *i,void *inf){
-  Nodo *novo = novoNodo(inf);
-  if(i){
-    if(i == l->ult){
-      novo->ant = l->ult;
-      l->ult->prox = novo;
-      l->ult = novo;
+    Nodo *novo = novoNodo(inf);
+    if(i){
+        if(i == l->ult){
+        novo->ant = l->ult;
+        l->ult->prox = novo;
+        l->ult = novo;
+        }
+        else{
+        novo->ant = i;
+        novo->prox = i->prox;
+        novo->prox->ant = novo;
+        i->prox = novo;
+        }
     }
-    else{
-      novo->ant = i;
-      novo->prox = i->prox;
-      novo->prox->ant = novo;
-      i->prox = novo;
+    else if(l->prim){
+        novo->prox = l->prim;
+        if(l->prim) l->prim->ant = novo;
+        l->prim = novo;
     }
-  }
-  else if(l->prim){
-    novo->prox = l->prim;
-    if(l->prim) l->prim->ant = novo;
-    l->prim = novo;
-  }
-  else l->prim = l->ult = novo;
-  l->tam++;
+    else l->prim = l->ult = novo;
+    l->tam++;
 }
 
 void *rmvNodoPtr(Lista *l,Nodo *i){
@@ -63,7 +60,7 @@ void *rmvNodoPtr(Lista *l,Nodo *i){
     i->prox->ant = i->ant;
   }
   void *rinf = i->inf;
-  free(i); i = NULL;
+  i = NULL;
   l->tam--;
   return rinf;
 }
@@ -76,7 +73,7 @@ Nodo *busca(Lista *l,void *inf){
 }
 
 Pilha *novaPilha(){
-  Pilha *p = malloc(sizeof(Pilha));
+  Pilha *p = uffsloc(sizeof(Pilha));
   p->tam = 0;
   p->topo = NULL;
   return p;
@@ -98,7 +95,6 @@ void *pop(Pilha *p){
   p->topo = k->prox;
   if(p->topo) p->topo->ant = NULL;
   p->tam--;
-  free(k);
   return inf;
 }
 

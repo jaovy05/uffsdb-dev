@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <readline/history.h>
+#include "memoryContext.h"
 
 ////
 #ifndef FMACROS // garante que macros.h não seja reincluída
@@ -227,7 +228,7 @@ void strncpylower(char *dest, char *src, int length) {
 
 int TrocaArquivosObj(char *nomeTabela, char *linha){
     int x = 0,r = 0;
-    char *tabela = malloc(sizeof(char) * TAMANHO_NOME_TABELA);
+    char *tabela = uffsloc(sizeof(char) * TAMANHO_NOME_TABELA);
 
     while(x < TAMANHO_NOME_TABELA){
         tabela[x] = linha[x];
@@ -236,7 +237,6 @@ int TrocaArquivosObj(char *nomeTabela, char *linha){
 
     if(objcmp(tabela, nomeTabela) == 0) r = 1;
 
-    free(tabela);
     tabela = NULL;
     return r;
 }

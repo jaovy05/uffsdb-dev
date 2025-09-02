@@ -13,7 +13,7 @@ void initMemoryContext() {
     // root.permanent = calloc(1, sizeof(MemoryContext)); talvez futuramente
 }
 
-void* uffsloc(size_t size) {
+void* uffslloc(size_t size) {
     size += 1;
     MemoryContext *context = root.temporary;
     while(context) {
@@ -58,18 +58,16 @@ void uffsFreeRecursive(MemoryContext *context){
 }
 
 void *uffsRealloc(void *ptr, size_t newSize) {
-    if(ptr == NULL) return uffsloc(newSize); // vai que
+    if(ptr == NULL) return uffslloc(newSize);
 
     uffs_mem_header *header = (uffs_mem_header *)((char *)ptr - sizeof(uffs_mem_header));
-    size_t oldSize = header->size;
-
+    size_t oldSize = header->size - 1; // desconsidera o \0
     if(newSize <= oldSize) {
-        header->size = newSize;
-        header->data[newSize - 1] = '\0';
+        header->size = newSize + 1;
+        header->data[newSize] = '\0';
         return ptr;
     }
-
-    void *newPtr = uffsloc(newSize);
+    void *newPtr = uffslloc(newSize);
 
     memcpy(newPtr, ptr, oldSize); 
     return newPtr;

@@ -38,7 +38,7 @@ void getComando(char * input){
     add_history(input);
     
     size_t len = strlen(input);
-    char *buffer = uffsloc(len + 2);  // +2 para '\n' e '\0'
+    char *buffer = uffslloc(len + 2);  // +2 para '\n' e '\0'
     
     strcpy(buffer, input);
     buffer[len] = '\n';  // Adiciona quebra de linha

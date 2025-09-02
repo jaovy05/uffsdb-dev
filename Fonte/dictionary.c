@@ -100,7 +100,7 @@ int verificaNomeTabela(char *nomeTabela) {
     if(strlen(nomeTabela) > TAMANHO_NOME_TABELA) return 0;
 
     FILE *dicionario;
-    char *tupla = (char *)uffsloc(sizeof(char)*TAMANHO_NOME_TABELA);
+    char *tupla = (char *)uffslloc(sizeof(char)*TAMANHO_NOME_TABELA);
 
     char directory[LEN_DB_NAME_IO];
     strcpy(directory, connected.db_directory);
@@ -186,9 +186,9 @@ char retornaTamanhoTipoDoCampo(char *nomeCampo, table  *tab) {
 tp_table *procuraAtributoFK(struct fs_objects objeto){
     FILE *schema;
     int cod = 0, chave, i = 0;
-    char *tupla = (char *)uffsloc(sizeof(char) * 109);
-    tp_table *esquema = (tp_table *)uffsloc(sizeof(tp_table)*objeto.qtdCampos);
-    tp_table *vetEsqm = (tp_table *)uffsloc(sizeof(tp_table)*objeto.qtdCampos);
+    char *tupla = (char *)uffslloc(sizeof(char) * 109);
+    tp_table *esquema = (tp_table *)uffslloc(sizeof(tp_table)*objeto.qtdCampos);
+    tp_table *vetEsqm = (tp_table *)uffslloc(sizeof(tp_table)*objeto.qtdCampos);
     memset(vetEsqm, 0, sizeof(tp_table)*objeto.qtdCampos);
     memset(esquema, 0, sizeof(tp_table)*objeto.qtdCampos);
 
@@ -240,7 +240,7 @@ tp_table *procuraAtributoFK(struct fs_objects objeto){
 
 struct fs_objects leObjetoById(int idTabela){
     FILE *dicionario;
-    char *tupla = (char *)uffsloc(sizeof(char)*TAMANHO_NOME_TABELA);
+    char *tupla = (char *)uffslloc(sizeof(char)*TAMANHO_NOME_TABELA);
     memset(tupla, '\0', TAMANHO_NOME_TABELA);
     int cod, qtdCampos, qtdIndice;
 
@@ -286,7 +286,7 @@ struct fs_objects leObjetoById(int idTabela){
 struct fs_objects leObjeto(char *nomeTabela) {
 
     FILE *dicionario;
-    char *tupla = (char *)uffsloc(sizeof(char)*TAMANHO_NOME_TABELA);
+    char *tupla = (char *)uffslloc(sizeof(char)*TAMANHO_NOME_TABELA);
     memset(tupla, '\0', TAMANHO_NOME_TABELA);
     int cod;
     int i = 0;
@@ -343,12 +343,12 @@ struct fs_objects leObjeto(char *nomeTabela) {
 tp_table *leSchema (struct fs_objects objeto){
     FILE *schema;
     int i = 0, cod = 0;
-    char *tupla = (char *)uffsloc(sizeof(char)*TAMANHO_NOME_CAMPO);
+    char *tupla = (char *)uffslloc(sizeof(char)*TAMANHO_NOME_CAMPO);
     memset(tupla, 0, TAMANHO_NOME_CAMPO);
-    char *tuplaT = (char *)uffsloc(sizeof(char)*TAMANHO_NOME_TABELA+1);
+    char *tuplaT = (char *)uffslloc(sizeof(char)*TAMANHO_NOME_TABELA+1);
     memset(tuplaT, 0, TAMANHO_NOME_TABELA+1);
 
-    tp_table *esquema = (tp_table *)uffsloc(sizeof(tp_table)*(objeto.qtdCampos+1)); // Aloca esquema com a quantidade de campos necessarios.
+    tp_table *esquema = (tp_table *)uffslloc(sizeof(tp_table)*(objeto.qtdCampos+1)); // Aloca esquema com a quantidade de campos necessarios.
     memset(esquema, 0, (objeto.qtdCampos+1)*sizeof(tp_table));
     for (i = 0; i < objeto.qtdCampos+1; i++)  esquema[i].next = NULL;
 
@@ -411,7 +411,7 @@ int procuraObjectArquivo(char *nomeTabela){
         achou        = 0,
         tamanhoTotal = 52;
 
-    char *table = (char *)uffsloc(sizeof(char) * tamanhoTotal);
+    char *table = (char *)uffslloc(sizeof(char) * tamanhoTotal);
     FILE *dicionario, *fp;
 
     char directory[LEN_DB_NAME_IO];
@@ -513,7 +513,7 @@ tp_table* verificaIntegridade(char *nTabela){
         fread(&esquema.tabelaApt, TAMANHO_NOME_TABELA, 1, fp);
         fread(&esquema.attApt, TAMANHO_NOME_CAMPO, 1, fp);
         if(!strncmp(nTabela, esquema.tabelaApt, 20) && esquema.chave == FK){
-            tp_table *e = (tp_table *)uffsloc(sizeof(tp_table));
+            tp_table *e = (tp_table *)uffslloc(sizeof(tp_table));
             memcpy(e, &esquema, sizeof(tp_table));
             e->next = fkColumns;
             fkColumns = e;
@@ -525,7 +525,7 @@ tp_table* verificaIntegridade(char *nTabela){
 
 nodo *buildBplusForPK(tp_table *filho) { //TODO: RENOMEAR FUNÇÃO
     struct fs_objects tabela = leObjetoById(filho->id);
-    char *pkFileName = (char *)uffsloc(TAMANHO_NOME_INDICE);
+    char *pkFileName = (char *)uffslloc(TAMANHO_NOME_INDICE);
     pkFileName = strcat(tabela.nome, filho->nome);
     return constroi_bplus(pkFileName);
 }
@@ -536,7 +536,7 @@ table *iniciaTabela(char *nome){
         return ERRO_NOME_TABELA_INVALIDO;
     }
 
-    table *t = (table *)uffsloc(sizeof(table)*1);
+    table *t = (table *)uffslloc(sizeof(table)*1);
     memset(t,0,sizeof(table));
     strcpylower(t->nome,nome); // Inicia a estrutura de tabela com o nome da tabela.
     t->esquema = NULL; // Inicia o esquema da tabela com NULL.
@@ -550,7 +550,7 @@ table *adicionaCampo(table *t,char *nomeCampo, char tipoCampo, int tamanhoCampo,
     if(t == NULL) return ERRO_ESTRUTURA_TABELA_NULA;
     tp_table *aux;
     if(t->esquema == NULL){ // Se o campo for o primeiro a ser adicionado, adiciona campo no esquema.
-      e = (tp_table *)uffsloc(sizeof(tp_table));
+      e = (tp_table *)uffslloc(sizeof(tp_table));
       memset(e, 0, sizeof(tp_table));
       if (e == NULL) return ERRO_DE_ALOCACAO;
 
@@ -575,7 +575,7 @@ table *adicionaCampo(table *t,char *nomeCampo, char tipoCampo, int tamanhoCampo,
     else {
         for(aux = t->esquema; aux != NULL; aux = aux->next){ // Anda até o final da estrutura de campos.
             if(aux->next == NULL){ // Adiciona um campo no final.
-                e = (tp_table *)uffsloc(sizeof(tp_table));
+                e = (tp_table *)uffslloc(sizeof(tp_table));
                 memset(e, 0, sizeof(*e));
                 if (e == NULL) return ERRO_DE_ALOCACAO;
                 e->next = NULL;
@@ -659,7 +659,7 @@ int finalizaTabela(table *t){
 ////
 // INSERE NA TABELA
 column *insereValor(table  *tab, column *c, char *nomeCampo, char *valorCampo) {    
-    column *e = (column *)uffsloc(sizeof(column));
+    column *e = (column *)uffslloc(sizeof(column));
     if (e == NULL) return ERRO_DE_ALOCACAO;
     e->next = NULL;
 
@@ -683,7 +683,7 @@ column *insereValor(table  *tab, column *c, char *nomeCampo, char *valorCampo) {
     
     int nTam = (tipo == 'S') ? tam : strlen(valorCampo);
 
-    e->valorCampo = (char *)uffsloc(sizeof(char) * (nTam+1));
+    e->valorCampo = (char *)uffslloc(sizeof(char) * (nTam+1));
     if (e->valorCampo == NULL) {
         return ERRO_DE_ALOCACAO;
     }
@@ -713,7 +713,7 @@ void printTable(char *tbl){
 	if(tbl == NULL){     //mostra todas as tabelas do banco
 		FILE *dicionario;
 		printf("		List of Relations\n");
-		char *tupla = (char *)uffsloc(sizeof(char)*TAMANHO_NOME_TABELA);
+		char *tupla = (char *)uffslloc(sizeof(char)*TAMANHO_NOME_TABELA);
 
 		char directory[LEN_DB_NAME_IO];
     	strcpy(directory, connected.db_directory);
@@ -752,15 +752,15 @@ void printTable(char *tbl){
 
 		abreTabela(tbl, &objeto1, &esquema1);
 
-		tp_table *tab3 = (tp_table *)uffsloc(sizeof(struct tp_table));
+		tp_table *tab3 = (tp_table *)uffslloc(sizeof(struct tp_table));
 		tab3 = procuraAtributoFK(objeto1); //retorna tp_table
 		int l, ipk=0, ifk=0, ibt=0;
 
-		char **pk 			= (char**)uffsloc(objeto1.qtdCampos*sizeof(char**));
-		char **fkTable		= (char**)uffsloc(objeto1.qtdCampos*sizeof(char**));
-		char **fkColumn 	= (char**)uffsloc(objeto1.qtdCampos*sizeof(char**));
-		char **refColumn 	= (char**)uffsloc(objeto1.qtdCampos*sizeof(char**));
-    char **btIndex		= (char**)uffsloc(objeto1.qtdIndice*sizeof(char*));
+		char **pk 			= (char**)uffslloc(objeto1.qtdCampos*sizeof(char**));
+		char **fkTable		= (char**)uffslloc(objeto1.qtdCampos*sizeof(char**));
+		char **fkColumn 	= (char**)uffslloc(objeto1.qtdCampos*sizeof(char**));
+		char **refColumn 	= (char**)uffslloc(objeto1.qtdCampos*sizeof(char**));
+    char **btIndex		= (char**)uffslloc(objeto1.qtdIndice*sizeof(char*));
 
 		memset(pk 		, 0, objeto1.qtdCampos);
 		memset(fkTable 	, 0, objeto1.qtdCampos);
@@ -770,10 +770,10 @@ void printTable(char *tbl){
 
 		int i;
 		for(i=0; i<objeto1.qtdCampos; i++) {
-			pk[i] 			= (char*)uffsloc(TAMANHO_NOME_CAMPO*sizeof(char));
-			fkTable[i] 		= (char*)uffsloc(TAMANHO_NOME_CAMPO*sizeof(char));
-			fkColumn[i] 	= (char*)uffsloc(TAMANHO_NOME_CAMPO*sizeof(char));
-			refColumn[i] 	= (char*)uffsloc(TAMANHO_NOME_CAMPO*sizeof(char));
+			pk[i] 			= (char*)uffslloc(TAMANHO_NOME_CAMPO*sizeof(char));
+			fkTable[i] 		= (char*)uffslloc(TAMANHO_NOME_CAMPO*sizeof(char));
+			fkColumn[i] 	= (char*)uffslloc(TAMANHO_NOME_CAMPO*sizeof(char));
+			refColumn[i] 	= (char*)uffslloc(TAMANHO_NOME_CAMPO*sizeof(char));
 
 			memset(pk[i] 		, '\0', TAMANHO_NOME_CAMPO);
 			memset(fkTable[i] 	, '\0', TAMANHO_NOME_CAMPO);
@@ -783,7 +783,7 @@ void printTable(char *tbl){
 		}
 
     for(i=0; i<objeto1.qtdIndice; i++) {
-      btIndex[i] = (char*)uffsloc (TAMANHO_NOME_CAMPO*sizeof(char));
+      btIndex[i] = (char*)uffslloc (TAMANHO_NOME_CAMPO*sizeof(char));
     }
 
 		for(l=0; l<objeto1.qtdCampos; l++) {

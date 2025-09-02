@@ -190,7 +190,7 @@ void substitui(Lista *l,tupla *tuple){
       else if(c->tipoCampo == 'I' || c->tipoCampo == 'D') iw->id = VALUE_NUMBER;
     }
     else if(iw->id == VALUE_NUMBER){//todo inteiro vai pra double.
-      double *num = uffsloc(sizeof(double));
+      double *num = uffslloc(sizeof(double));
       *num = atof((char *)(iw->token));
       iw->token = (void *)num;
     }
@@ -207,7 +207,7 @@ column *buscaColuna(tupla *tuple, char *str){
 void *converter(char tipo,char* valor){
     if(valor == COLUNA_NULL) return COLUNA_NULL;
     if(tipo == 'S' || tipo == 'C'){
-        char *str = uffsloc(sizeof(char)*strlen(valor)+3);
+        char *str = uffslloc(sizeof(char)*strlen(valor)+3);
         str[0] = '\0'; //não retire.
         strcat(str,"'");
         strcat(str,valor);
@@ -215,7 +215,7 @@ void *converter(char tipo,char* valor){
         return (void *)str;
     }
 
-    double *num = uffsloc(sizeof(double));
+    double *num = uffslloc(sizeof(double));
     if(tipo == 'I') *num = (*((int *)valor))*1.0;
     else *num = *(double *)valor;
     

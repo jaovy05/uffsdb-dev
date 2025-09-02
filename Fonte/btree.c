@@ -17,11 +17,11 @@ void decnTuplas()
 
 nodo* criaNodo() {
 	nodo * novo = NULL;
-	novo = (nodo*)uffsloc(sizeof(nodo));
+	novo = (nodo*)uffslloc(sizeof(nodo));
 	novo->filhos = NULL;
 	novo->pai = novo->prox = novo->ant = NULL;
-	novo->data = (char**)uffsloc(ordem * sizeof(char*));
-	novo->endereco = (long int*)uffsloc(ordem * sizeof(long int));
+	novo->data = (char**)uffslloc(ordem * sizeof(char*));
+	novo->endereco = (long int*)uffslloc(ordem * sizeof(long int));
 	novo->quant_data = 0;
 	return novo;
 }
@@ -50,7 +50,7 @@ void imprime(nodo* n) {
 //recebe o nome de uma tabela, concatena a extensão .dat e retorna essa junção.
 char* concatena_extensao(char* nomeTabela) {
 	char *concatena;
-	concatena = (char*)uffsloc(sizeof(char)*(strlen(nomeTabela) + strlen(".dat")+1));
+	concatena = (char*)uffslloc(sizeof(char)*(strlen(nomeTabela) + strlen(".dat")+1));
 	strcpy(concatena,nomeTabela);
 	strcat(concatena,".dat");
 	return concatena;
@@ -78,7 +78,7 @@ int cmpstr (const void *a, const void *b){
 /* Insere os valores da chave (ind) e do endereço da tupla no arquivo de dados
  * (end) em um nodo (n) */
 nodo* insereChaveEmNodoFolha(char* ind, long int end, nodo *n){
-	n->data[n->quant_data] = (char *)uffsloc((strlen(ind)+1) * sizeof(char));
+	n->data[n->quant_data] = (char *)uffslloc((strlen(ind)+1) * sizeof(char));
 	strcpy(n->data[n->quant_data], ind);
 	n->endereco[n->quant_data] = end;
 	n->quant_data++;
@@ -89,7 +89,7 @@ nodo* insereChaveEmNodoFolha(char* ind, long int end, nodo *n){
 
 /* Insere unicamente o valor da chave em um nodo interno (n) */
 nodo* insereChaveEmNodoInterno(char* ind, nodo* n) {
-	n->data[n->quant_data] = (char *)uffsloc((strlen(ind)+1) * sizeof(char));
+	n->data[n->quant_data] = (char *)uffslloc((strlen(ind)+1) * sizeof(char));
 	strcpy(n->data[n->quant_data], ind);
 	n->quant_data++;
 	n->filhos = (nodo**)uffsRealloc(n->filhos, sizeof(nodo**) * (n->quant_data+1)); //aumenta o numero de ponteiros para filhos
@@ -194,7 +194,7 @@ nodo* constroi_bplus(char* nomeTabela){
 	fseek(new,0,SEEK_SET);
 
 	while(1){
-		palavra = (char*)uffsloc(sizeof(char));
+		palavra = (char*)uffslloc(sizeof(char));
 		while(le != '$'){
 			fread(&le, sizeof(char),1,new);
 			if(le != '$') {

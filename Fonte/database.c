@@ -83,7 +83,7 @@ void createDB(char *db_name) {
   	return;
   }
 
-  data_base *SGBD = (data_base*)uffsloc(sizeof(data_base));
+  data_base *SGBD = (data_base*)uffslloc(sizeof(data_base));
 	len = strlen(db_name);
 
 	SGBD->valid = 1;
@@ -94,7 +94,7 @@ void createDB(char *db_name) {
 	SGBD->db_directory[len+1] 	= '\0';
 	fwrite(SGBD ,sizeof(data_base), 1, DB);
 
-  aux_name_tolower = (char *)uffsloc(sizeof(char) * (strlen(db_name)+1)); // porque usar malloc e não um array comum: char aux_name_tolower[strlen(db_name) + 1];
+  aux_name_tolower = (char *)uffslloc(sizeof(char) * (strlen(db_name)+1)); // porque usar malloc e não um array comum: char aux_name_tolower[strlen(db_name) + 1];
   strcpylower(aux_name_tolower, db_name);
   strcat(create, aux_name_tolower);
 

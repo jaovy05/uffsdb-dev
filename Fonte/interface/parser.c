@@ -44,7 +44,7 @@ rc_parser GLOBAL_PARSER;
 void connect(char *nome) {
   int r = connectDB(nome);
 	if (r == SUCCESS) {
-    connected.db_name = uffsloc(sizeof(char)*((strlen(nome)+1)));
+    connected.db_name = uffslloc(sizeof(char)*((strlen(nome)+1)));
     strcpylower(connected.db_name, nome);
     connected.conn_active = 1;
     printf("You are now connected to database \"%s\" as user \"uffsdb\".\n", nome);
@@ -69,7 +69,7 @@ void notConnected() {
 
 void adcTabelaQuery(char *nome, char type){
     int len = strlen(nome);
-    QUERY.tabela = uffsloc((len + 1)*sizeof(char));
+    QUERY.tabela = uffslloc((len + 1)*sizeof(char));
     strncpy(QUERY.tabela,nome,len);
     QUERY.tabela[len] = '\0';
     QUERY.queryType = type;
@@ -86,7 +86,7 @@ void adcTokenWhere(char *token,int id){
 
 void adcProjSelect(char *col){
     int len = strlen(col);
-    char *str = uffsloc(sizeof(char)*(len + 1));
+    char *str = uffslloc(sizeof(char)*(len + 1));
     strncpy(str,col,len);
     str[len] = '\0';
     if(!QUERY.proj) QUERY.proj = novaLista(NULL);
@@ -95,7 +95,7 @@ void adcProjSelect(char *col){
 
 void setObjName(char **nome) {
     if (GLOBAL_PARSER.mode != 0) {
-        GLOBAL_DATA.objName = uffsloc(sizeof(char)*(strlen(*nome) + 1));
+        GLOBAL_DATA.objName = uffslloc(sizeof(char)*(strlen(*nome) + 1));
         strcpylower(GLOBAL_DATA.objName, *nome);
         GLOBAL_DATA.objName[strlen(*nome)] = '\0';
         GLOBAL_PARSER.step++;
@@ -105,7 +105,7 @@ void setObjName(char **nome) {
 void setColumnInsert(char **nome) {
     GLOBAL_DATA.columnName = uffsRealloc(GLOBAL_DATA.columnName, (GLOBAL_PARSER.col_count+1)*sizeof(char *));
 
-    GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count] = uffsloc(sizeof(char)*(strlen(*nome)+1));
+    GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count] = uffslloc(sizeof(char)*(strlen(*nome)+1));
     strcpylower(GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count], *nome);
     GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count][strlen(*nome)] = '\0';
 
@@ -118,7 +118,7 @@ void setValueInsert(char *nome, char type) {
     GLOBAL_DATA.type    = uffsRealloc(GLOBAL_DATA.type, (GLOBAL_PARSER.val_count+1)*sizeof(char));
 
     // Adiciona o valor no vetor de strings
-    GLOBAL_DATA.values[GLOBAL_PARSER.val_count] = uffsloc(sizeof(char)*(strlen(nome)+1));
+    GLOBAL_DATA.values[GLOBAL_PARSER.val_count] = uffslloc(sizeof(char)*(strlen(nome)+1));
     if (type == 'I' || type == 'D') {
         strcpy(GLOBAL_DATA.values[GLOBAL_PARSER.val_count], nome);
         GLOBAL_DATA.values[GLOBAL_PARSER.val_count][strlen(nome)] = '\0';
@@ -142,10 +142,10 @@ void setColumnCreate(char **nome) {
     GLOBAL_DATA.values      = uffsRealloc(GLOBAL_DATA.values, (GLOBAL_PARSER.col_count+1)*sizeof(char *));
     GLOBAL_DATA.type        = uffsRealloc(GLOBAL_DATA.type, (GLOBAL_PARSER.col_count+1)*sizeof(char *));
 
-    GLOBAL_DATA.values[GLOBAL_PARSER.col_count] = uffsloc(sizeof(char));
-    GLOBAL_DATA.fkTable[GLOBAL_PARSER.col_count] = uffsloc(sizeof(char));
-    GLOBAL_DATA.fkColumn[GLOBAL_PARSER.col_count] = uffsloc(sizeof(char));
-    GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count] = uffsloc(sizeof(char)*(strlen(*nome)+1));
+    GLOBAL_DATA.values[GLOBAL_PARSER.col_count] = uffslloc(sizeof(char));
+    GLOBAL_DATA.fkTable[GLOBAL_PARSER.col_count] = uffslloc(sizeof(char));
+    GLOBAL_DATA.fkColumn[GLOBAL_PARSER.col_count] = uffslloc(sizeof(char));
+    GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count] = uffslloc(sizeof(char)*(strlen(*nome)+1));
 
     strcpylower(GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count], *nome);
 
@@ -174,7 +174,7 @@ void setColumnPKCreate() {
 
 void setColumnBtreeCreate(char **nome) {
     GLOBAL_DATA.columnName = uffsRealloc(GLOBAL_DATA.columnName, (GLOBAL_PARSER.col_count+1)*sizeof(char*));
-    GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count] = uffsloc(sizeof(char)*(strlen(*nome)+1));
+    GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count] = uffslloc(sizeof(char)*(strlen(*nome)+1));
     strcpylower(GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count], *nome);
 }
 
@@ -228,9 +228,9 @@ void clearGlobalStructs() {
 
     GLOBAL_DATA.fkColumn = NULL;
 
-    GLOBAL_DATA.type = (char *)uffsloc(sizeof(char));
+    GLOBAL_DATA.type = (char *)uffslloc(sizeof(char));
 
-    GLOBAL_DATA.attribute = (int *)uffsloc(sizeof(int));
+    GLOBAL_DATA.attribute = (int *)uffslloc(sizeof(int));
 
     yylex_destroy();
 

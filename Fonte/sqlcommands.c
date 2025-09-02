@@ -164,7 +164,7 @@ char *getInsertedValue(rc_insert *s_insert, char *columnName, table *tabela) {
 
   int maxPK = getMaxPrimaryKey(tabela->nome);
 	char tipo = retornaTamanhoTipoDoCampo(columnName, tabela);
-	char *noValue = (char *)uffsloc(50); 
+	char *noValue = (char *)uffslloc(50); 
 
 	if (tipo == 'I') {
     if(verifyFK(tabela->nome, columnName))
@@ -355,8 +355,8 @@ int finalizaInsert(char *nome, column *c, int tamTupla){
     tp_table *auxT ; // Le esquema
     auxT = abreTabela(nome, &dicio, &auxT);
 
-    table *tab     = (table *)uffsloc(sizeof(table));
-    tp_table *tab2 = (tp_table *)uffsloc(sizeof(struct tp_table));
+    table *tab     = (table *)uffslloc(sizeof(table));
+    tp_table *tab2 = (tp_table *)uffslloc(sizeof(struct tp_table));
     memset(tab2, 0, sizeof(tp_table));
 
     tab->esquema = abreTabela(nome, &objeto, &tab->esquema);
@@ -380,7 +380,7 @@ int finalizaInsert(char *nome, column *c, int tamTupla){
                     erro = ERRO_INDEX_NULL;
                 }
 
-                arquivoIndice = (char *)uffsloc(sizeof(char) *
+                arquivoIndice = (char *)uffslloc(sizeof(char) *
                   (strlen(connected.db_directory) + strlen(nome) + strlen(tab2[j].nome)));
                 strcpy(arquivoIndice, connected.db_directory); //diretorio
                 strcat(arquivoIndice, nome); //nome da tabela
@@ -404,7 +404,7 @@ int finalizaInsert(char *nome, column *c, int tamTupla){
                     return  ERRO_INDEX_NULL;
                 }
               //monta o nome do arquivo de indice da chave estrangeira
-                arquivoIndice = (char *)uffsloc(sizeof(char) *
+                arquivoIndice = (char *)uffslloc(sizeof(char) *
                     (strlen(connected.db_directory) + strlen(tab2[j].tabelaApt) + strlen(tab2[j].attApt)));// caminho diretorio de arquivo de indice
                 strcpy(arquivoIndice, connected.db_directory); //diretorio
                 strcat(arquivoIndice, tab2[j].tabelaApt);
@@ -444,7 +444,7 @@ int finalizaInsert(char *nome, column *c, int tamTupla){
 
     fputc(0, dados); // flag para tupla não deletada
 
-    char* buffer = (char *)calloc(tamTupla, sizeof(char));
+    char* buffer = (char *)uffslloc(tamTupla * sizeof(char));
     int offsetBuffer = 0;
 
     for(auxC = c, t = 0; auxC != NULL; auxC = auxC->next, t++){
@@ -452,7 +452,7 @@ int finalizaInsert(char *nome, column *c, int tamTupla){
 
         if (auxT[t].chave == PK && flag == 0) {
 			char * nomeAtrib;
-      		nomeAtrib = (char*)uffsloc((strlen(nome)+strlen(auxC->nomeCampo) + strlen(connected.db_directory))* sizeof(char));
+      		nomeAtrib = (char*)uffslloc((strlen(nome)+strlen(auxC->nomeCampo) + strlen(connected.db_directory))* sizeof(char));
       		strcpy(nomeAtrib, connected.db_directory);
       		strcat(nomeAtrib, nome);
       		strcat(nomeAtrib,auxC->nomeCampo);
@@ -469,7 +469,7 @@ int finalizaInsert(char *nome, column *c, int tamTupla){
 			char * nomeAtrib2;
             //ntuplas = ntuplas-1;
             decnTuplas();
-      		nomeAtrib2 = (char*)uffsloc((strlen(nome)+strlen(auxC->nomeCampo) + strlen(connected.db_directory))* sizeof(char));
+      		nomeAtrib2 = (char*)uffslloc((strlen(nome)+strlen(auxC->nomeCampo) + strlen(connected.db_directory))* sizeof(char));
       		strcpy(nomeAtrib2, connected.db_directory);
       		strcat(nomeAtrib2, nome);
       		strcat(nomeAtrib2,auxC->nomeCampo);
@@ -480,7 +480,7 @@ int finalizaInsert(char *nome, column *c, int tamTupla){
 
         if(auxC->valorCampo == COLUNA_NULL) {
             fputc(1, dados);
-            auxC->valorCampo = (char *)uffsloc(2);
+            auxC->valorCampo = (char *)uffslloc(2);
     
             auxC->valorCampo[0] = '0';
             auxC->valorCampo[1] = '\0';
@@ -566,7 +566,7 @@ int finalizaInsert(char *nome, column *c, int tamTupla){
  */
 void insert(rc_insert *s_insert) {
 	int i;
-	table *tabela = (table *)uffsloc(sizeof(table));
+	table *tabela = (table *)uffslloc(sizeof(table));
 	tabela->esquema = NULL;
 	memset(tabela, 0, sizeof(table));
 	column *colunas = NULL;
@@ -637,14 +637,14 @@ int validaProj(Lista *proj, tp_table *colunas, int qtdColunas, int *indiceProj){
         proj->tam = 0;
         for(int j = 0; j < qtdColunas; j++){
             indiceProj[j] = (char) j;
-            char *str = uffsloc(sizeof(char) * strlen(colunas[j].nome));
+            char *str = uffslloc(sizeof(char) * strlen(colunas[j].nome));
             strcpy(str, colunas[j].nome);
             adcNodo(proj, proj->ult, str);
         }
         return 1;
     }
 
-    char *validar = uffsloc(sizeof(char) * proj->tam);
+    char *validar = uffslloc(sizeof(char) * proj->tam);
     memset(validar, 0, proj->tam); // Inicializa o vetor de validação com 0
 
     int i = 0;
@@ -667,9 +667,9 @@ int validaProj(Lista *proj, tp_table *colunas, int qtdColunas, int *indiceProj){
 }
 
 inf_where *novoTokenWhere(char *str,int id){
-  inf_where *novo = uffsloc(sizeof(inf_where));
+  inf_where *novo = uffslloc(sizeof(inf_where));
   novo->id = id;
-  char *tk = uffsloc(sizeof(char)*strlen(str));
+  char *tk = uffslloc(sizeof(char)*strlen(str));
   strcpy(tk,str);
   novo->token = (void *)tk;
   return novo;
@@ -678,16 +678,16 @@ inf_where *novoTokenWhere(char *str,int id){
 inf_where *novoResWhere(void *tk,int id){
   if(id == STRING || id == ABRE_PARENT || id == FECHA_PARENT)
     return novoTokenWhere((char *)tk,id);
-  inf_where *novo = uffsloc(sizeof(inf_where));
+  inf_where *novo = uffslloc(sizeof(inf_where));
   novo->id = id;
   if(id == NULLA) novo->token = COLUNA_NULL;
   else if(novo->id == VALUE_NUMBER){
-    double *tok = uffsloc(sizeof(double));
+    double *tok = uffslloc(sizeof(double));
     *tok = *((double *)tk);
     novo->token = (void *)tok;
   }
   else{//BOOLEANO
-    char *tok = uffsloc(sizeof(char));
+    char *tok = uffslloc(sizeof(char));
     *tok = *((char *)tk);
     novo->token = (void *)tok;
   }
@@ -765,32 +765,32 @@ void printConsulta(Lista *proj, Lista *result){
 void adcResultado(Lista *resultado, tupla *tuple, int *indiceProj, int qtdColunasProj){
     adcNodo(resultado, resultado->ult, (void *)novaLista(NULL));
     Lista *tuplaRes = (Lista *)(resultado->ult->inf);
-    inf_where **listNw = (inf_where **)uffsloc(sizeof(inf_where *) * tuple->ncols);
+    inf_where **listNw = (inf_where **)uffslloc(sizeof(inf_where *) * tuple->ncols);
 
     for(uint i = 0; i < tuple->ncols; i++){
-        inf_where *nw = uffsloc(sizeof(inf_where));
+        inf_where *nw = uffslloc(sizeof(inf_where));
         column *c = &tuple->column[i];
         nw->id = c->tipoCampo;
 
         if(c->valorCampo == (void *)COLUNA_NULL) nw->token = COLUNA_NULL;
         else if(c->tipoCampo == 'S'){
-            char *str = uffsloc(sizeof(char)*strlen(c->valorCampo));
+            char *str = uffslloc(sizeof(char)*strlen(c->valorCampo));
             str[0] = '\0';
             strcpy(str, c->valorCampo);
             nw->token = (void *)str;
         }
         else if(c->tipoCampo == 'I'){
-            int *n = uffsloc(sizeof(int));
+            int *n = uffslloc(sizeof(int));
             *n = *(int *)(c->valorCampo);
             nw->token = (void *)n;
         }
         else if(c->tipoCampo == 'C'){
-            char *n = uffsloc(sizeof(char));
+            char *n = uffslloc(sizeof(char));
             *n = *(char *)(c->valorCampo);
             nw->token = (void *)n;
         }
         else if(c->tipoCampo == 'D'){
-            double *n = uffsloc(sizeof(double));
+            double *n = uffslloc(sizeof(double));
             *n = *(double *)(c->valorCampo);
             nw->token = (void *)n;
         }
@@ -886,7 +886,7 @@ Lista *handleTableOperation(inf_query *query, char tipo) {
 
     int *indiceProj = NULL, qtdCamposProj = 0;
     if(tipo == 's') {
-        indiceProj = (int *)uffsloc(sizeof(int) * query->proj->tam);
+        indiceProj = (int *)uffslloc(sizeof(int) * query->proj->tam);
         if(!validaProj(query->proj, esquema, objeto.qtdCampos, indiceProj)){
             return NULL;
         }
@@ -924,7 +924,7 @@ Lista *handleTableOperation(inf_query *query, char tipo) {
             }
             else satisfies = 1;
             if(!abortar && satisfies) {
-                tupla *t = (tupla*)uffsloc(sizeof(tupla));
+                tupla *t = (tupla*)uffslloc(sizeof(tupla));
                 memcpy(t, currentTuple, sizeof(tupla));
                 (tipo == 's') ? adcResultado(resultado, currentTuple, indiceProj, qtdCamposProj) : adcNodo(resultado, resultado->ult, t);
             }
@@ -945,10 +945,10 @@ Lista *handleTableOperation(inf_query *query, char tipo) {
 int procuraSchemaArquivo(struct fs_objects objeto){
     FILE *schema, *newSchema;
     int cod = 0;
-    char *tupla = (char *)uffsloc(sizeof(char) * 109);
+    char *tupla = (char *)uffslloc(sizeof(char) * 109);
     memset(tupla, '\0', 109);
 
-    tp_table *esquema = (tp_table *)uffsloc(sizeof(tp_table)*objeto.qtdCampos);
+    tp_table *esquema = (tp_table *)uffslloc(sizeof(tp_table)*objeto.qtdCampos);
     memset(esquema, 0, sizeof(tp_table)*objeto.qtdCampos);
 
     char directory[LEN_DB_NAME_IO];
@@ -1054,15 +1054,15 @@ int excluirTabela(char *nomeTabela) {
     abreTabela(nomeTabela, &objeto, &esquema);
     qtTable = quantidadeTabelas();
 
-    char **tupla = (char **)uffsloc(sizeof(char **)*qtTable);
+    char **tupla = (char **)uffslloc(sizeof(char **)*qtTable);
 
     memset(tupla, 0, qtTable);
 
     for (i=0; i < qtTable; i++) {
-        tupla[i] = (char *)uffsloc(sizeof(char)*TAMANHO_NOME_TABELA);
+        tupla[i] = (char *)uffslloc(sizeof(char)*TAMANHO_NOME_TABELA);
         memset(tupla[i], '\0', TAMANHO_NOME_TABELA);
     }
-    tp_table *tab2 = (tp_table *)uffsloc(sizeof(struct tp_table));
+    tp_table *tab2 = (tp_table *)uffslloc(sizeof(struct tp_table));
     tab2 = procuraAtributoFK(objeto);   //retorna o tipo de chave que e cada campo
     FILE *dicionario;
     char directory[LEN_DB_NAME_IO*2];
@@ -1088,7 +1088,7 @@ int excluirTabela(char *nomeTabela) {
 
                     abreTabela(tupla[j], &objeto1, &esquema1);
 
-                    tp_table *tab3 = (tp_table *)uffsloc(sizeof(struct tp_table));
+                    tp_table *tab3 = (tp_table *)uffslloc(sizeof(struct tp_table));
                     tab3 = procuraAtributoFK(objeto1);
 
                     for(l=0; l<objeto1.qtdCampos; l++) {
@@ -1166,7 +1166,7 @@ void createTable(rc_insert *t) {
   }
   int size;
   strcpylower(t->objName, t->objName);        //muda pra minúsculo
-  char *tableName = (char*) uffsloc(sizeof(char)*(TAMANHO_NOME_TABELA+10)),
+  char *tableName = (char*) uffslloc(sizeof(char)*(TAMANHO_NOME_TABELA+10)),
                     fkTable[TAMANHO_NOME_TABELA], fkColumn[TAMANHO_NOME_CAMPO];
     ushort codFK;
 
@@ -1228,7 +1228,7 @@ void createTable(rc_insert *t) {
   	for(int i = 0; i < t->N; i++) {
   		if(t->attribute[i] == PK) { //procura o atributo PK e cria o arquivo de índice
         char *aux_nome_index = NULL;
-  		  aux_nome_index = (char *)uffsloc(strlen(connected.db_directory) + strlen(t->objName) + strlen(t->columnName[i]));
+  		  aux_nome_index = (char *)uffslloc(strlen(connected.db_directory) + strlen(t->objName) + strlen(t->columnName[i]));
         strcpy(aux_nome_index, connected.db_directory);
         strcat(aux_nome_index, t->objName);
   		  strcat(aux_nome_index, t->columnName[i]);

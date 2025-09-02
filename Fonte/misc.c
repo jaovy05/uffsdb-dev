@@ -228,7 +228,7 @@ void strncpylower(char *dest, char *src, int length) {
 
 int TrocaArquivosObj(char *nomeTabela, char *linha){
     int x = 0,r = 0;
-    char *tabela = uffsloc(sizeof(char) * TAMANHO_NOME_TABELA);
+    char *tabela = uffslloc(sizeof(char) * TAMANHO_NOME_TABELA);
 
     while(x < TAMANHO_NOME_TABELA){
         tabela[x] = linha[x];

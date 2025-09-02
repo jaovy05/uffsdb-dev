@@ -8,14 +8,14 @@
 #endif
 
 Nodo *novoNodo(void *inf){
-    Nodo *novo = uffsloc(sizeof(Nodo));
+    Nodo *novo = uffslloc(sizeof(Nodo));
     novo->inf = inf;
     novo->ant = novo->prox = NULL;
     return novo;
 }
 
 Lista *novaLista(int (*cmp)(void *inf1,void *inf2)){
-    Lista *l = uffsloc(sizeof(Lista));
+    Lista *l = uffslloc(sizeof(Lista));
     l->tam = 0;
     l->cmp = cmp;
     l->prim = l->ult = NULL;
@@ -73,7 +73,7 @@ Nodo *busca(Lista *l,void *inf){
 }
 
 Pilha *novaPilha(){
-  Pilha *p = uffsloc(sizeof(Pilha));
+  Pilha *p = uffslloc(sizeof(Pilha));
   p->tam = 0;
   p->topo = NULL;
   return p;

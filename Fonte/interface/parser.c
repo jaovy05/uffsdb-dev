@@ -194,11 +194,6 @@ void setColumnFKColumnCreate(char **nome) {
 }
 
 void limparLista(Lista *l){
-  Nodo *k = l->prim,*j;
-  while(k){
-    j = k->prox;
-    k = j;
-  }
   l->prim = l->ult = NULL;
 }
 

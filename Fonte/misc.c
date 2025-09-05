@@ -5,22 +5,10 @@
 #include <readline/history.h>
 #include "memoryContext.h"
 
-////
-#ifndef FMACROS // garante que macros.h não seja reincluída
-   #include "macros.h"
-#endif
-///
-#ifndef FTYPES // garante que types.h não seja reincluída
-  #include "types.h"
-#endif
-
-#ifndef FBUFFER // garante que buffer.h não seja reincluída
-  #include "buffer.h"
-#endif
-
-#ifndef FDICTIONARY // the same
-  #include "dictionary.h"
-#endif
+#include "macros.h"
+#include "types.h"
+#include "buffer.h"
+#include "dictionary.h"
 
 int cabecalho(tp_table *s, int num_reg) {
     int count, aux=0;

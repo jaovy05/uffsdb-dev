@@ -1,5 +1,4 @@
-#define FPARSER 1
-////
+#pragma once////
 /* FUNÇÕES AUXILIARES DO INTERPRETADOR DE COMANDOS (yacc + lex)
  * O yacc vai chamando essas funções conforme vai identificando os tokens.
  * Essas funcções irão preencher uma estrutura, ou parte dela, e chamarão
@@ -14,9 +13,7 @@
 #define OP_CREATE_INDEX     7
 #define OP_DELETE           8
 
-#ifndef FCOMMANDHANDLER
-   #include "commandHandler.h"
-#endif
+#include "commandHandler.h"
 
 /* Estrutura global que guarda as informações obtidas pelo yacc
  * na identificação dos tokens

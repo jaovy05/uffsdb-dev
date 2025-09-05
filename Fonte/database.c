@@ -3,17 +3,9 @@
 #include <string.h>
 #include "memoryContext.h"
 ////
-#ifndef FMACROS // garante que macros.h não seja reincluída
-   #include "macros.h"
-#endif
-///
-#ifndef FTYPES // garante que types.h não seja reincluída
-  #include "types.h"
-#endif
-////
-#ifndef FMISC // garante que misc.h não seja reincluída
-  #include "misc.h"
-#endif
+#include "macros.h"
+#include "types.h"
+#include "misc.h"
 
 char connectDB(char *db_name) {
 	FILE *DB;

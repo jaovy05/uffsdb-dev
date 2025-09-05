@@ -3,24 +3,12 @@
 #include <stdio.h>
 
 #include "memoryContext.h"
-#ifndef FMACROS
-   #include "macros.h"
-#endif
-#ifndef FTYPES
-   #include "types.h"
-#endif
-#ifndef FMISC
-   #include "misc.h"
-#endif
-#ifndef FDICTIONARY
-   #include "dictionary.h"
-#endif
-#ifndef FSQLCOMMANDS
-   #include "sqlcommands.h"
-#endif
-#ifndef FDATABASE
-   #include "database.h"
-#endif
+#include "macros.h"
+#include "types.h"
+#include "misc.h"
+#include "dictionary.h"
+#include "sqlcommands.h"
+#include "database.h"
 
 #include "interface/y.tab.h"
 

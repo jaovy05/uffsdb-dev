@@ -61,11 +61,7 @@ int calculaOrdem (int nTuplas);
 
 void decnTuplas();
 
-//#ifndef FBTREE  // declare the variables only if this flag is not defined (preventing duplication)
-//#define FBTREE 1  
-//    int ordem;
-//    int ntuplas;
-//#endif
+
 
 
 

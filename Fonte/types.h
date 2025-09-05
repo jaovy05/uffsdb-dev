@@ -1,13 +1,9 @@
 #pragma once
-#ifndef FFUTILITY
-  #include "Utility.h"
-#endif
+
+#include "Utility.h"
+
 #include <stdint.h>
 #include "macros.h"
-
-typedef uint32_t uint;
-typedef uint16_t ushort;
-typedef uint8_t byte;
 
 #define FTYPES 1 // flag para identificar se types.h já foi incluída
 
@@ -134,7 +130,7 @@ typedef struct MemoryContextRoot {
 
 typedef struct {
     size_t size;
-    char data[];
+    char data[FLEXIBLE_ARRAY];
 } uffs_mem_header;
 
 // Union's utilizados na conversão de variáveis do tipo inteiro e double.

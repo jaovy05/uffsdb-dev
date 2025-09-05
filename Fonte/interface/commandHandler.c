@@ -5,9 +5,7 @@
 #include <readline/history.h>
 #include "../memoryContext.h"
 
-#ifndef FCOMMANDHANDLER
-   #include "commandHandler.h"
-#endif
+#include "commandHandler.h"
 
 char *comandos[] = {"select", "from", "where", "insert into", "values", "drop", "create", "table", "database", "index on", "int", "varchar", "char", NULL};
 

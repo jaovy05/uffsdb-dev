@@ -46,8 +46,10 @@ void* uffslloc(size_t size) {
 
 
 void uffsFree(MemoryContextType type) {
-    uffsFreeRecursive(root.temporary);
-    root.temporary = NULL;
+    if (!root.temporary) return;
+    MemoryContext *context = root.temporary;
+    uffsFreeRecursive(context->next);
+    memset(context, 0, sizeof(MemoryContext));
 }
 
 void uffsFreeRecursive(MemoryContext *context){
@@ -71,4 +73,15 @@ void *uffsRealloc(void *ptr, size_t newSize) {
 
     memcpy(newPtr, ptr, oldSize); 
     return newPtr;
+}
+
+void destroyMemoryContext() {
+    if (root.temporary) {
+        uffsFreeRecursive(root.temporary);
+        root.temporary = NULL;
+    }
+    if (root.permanent) {
+        uffsFreeRecursive(root.permanent);
+        root.permanent = NULL;
+    }
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Utility.h"
-
+#include "int.h"
 #include <stdint.h>
 #include "macros.h"
 

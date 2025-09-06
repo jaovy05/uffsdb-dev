@@ -5,17 +5,12 @@
 #include <string.h> // memcpy
 #include <stdlib.h> // calloc, free
 
-MemoryContextRoot root;
+MemoryContextRoot root = {0};
+static void uffsFreeRecursive(MemoryContext *context);
 
-void initMemoryContext() {
-    root.temporary = NULL;
-    root.permanent = NULL;
-    // root.permanent = calloc(1, sizeof(MemoryContext)); talvez futuramente
-}
-
-void* uffslloc(size_t size) {
+void* uffsllocType(size_t size, MemoryContextType type) {
     size += 1;
-    MemoryContext *context = root.temporary;
+    MemoryContext *context = type == TEMPORARY ? root.temporary : root.permanent;
     while(context) {
         // confere se na lista tem algum filho com um espacinho que não foi usado antes
         if(context->used + size <= MEMORY_CONTEXT_SIZE) { 
@@ -34,10 +29,18 @@ void* uffslloc(size_t size) {
         printf("Memory allocation failed for new memory context\n");
         return NULL;
     }
-    newContext->type = TEMPORARY; // por enquanto é fixo
+
+    newContext->type = type;
     newContext->used =  sizeof(uffs_mem_header) + size;
-    newContext->next = root.temporary ? root.temporary->next : NULL;
-    root.temporary = newContext;
+
+    if(type == TEMPORARY) {
+        newContext->next = root.temporary ? root.temporary->next : root.temporary;
+        root.temporary = newContext;
+    } else {
+        newContext->next = root.permanent ? root.permanent->next : root.permanent;
+        root.permanent = newContext;
+    }
+
     uffs_mem_header *ptr = (uffs_mem_header *)(newContext->memoryPool);
     ptr->size = size;
     ptr->data[size - 1] = '\0';

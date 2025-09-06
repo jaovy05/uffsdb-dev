@@ -29,16 +29,17 @@ inf_query QUERY;
 rc_parser GLOBAL_PARSER;
 
 void connect(char *nome) {
-  int r = connectDB(nome);
-	if (r == SUCCESS) {
-    connected.db_name = uffslloc(sizeof(char)*((strlen(nome)+1)));
+    int r = connectDB(nome);
+    if (r != SUCCESS) {
+        printf("ERROR: Failed to establish connection with database named \"%s\". (Error code: %d)\n", nome, r);
+        return;
+    }
+
+    connected.db_name = uffsllocType(sizeof(char)*((strlen(nome)+1)), PERMANENT);
     strcpylower(connected.db_name, nome);
     connected.conn_active = 1;
     printf("You are now connected to database \"%s\" as user \"uffsdb\".\n", nome);
-  }
-  else {
-  	printf("ERROR: Failed to establish connection with database named \"%s\". (Error code: %d)\n", nome, r);
-  }
+    
 }
 
 void invalidCommand(char *command) {
@@ -47,6 +48,7 @@ void invalidCommand(char *command) {
 
 void quit(int flag){
     write_history("data/history.txt");
+    destroyMemoryContext();
     exit(flag);
 };
 

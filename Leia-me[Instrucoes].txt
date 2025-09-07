@@ -6,7 +6,7 @@ Universidade Federal da Fronteira Sul – UFFS
 Curso: Ciência da Computação
 Componente Curricular: Banco de Dados II
 Professor: Dr. Denio Duarte
-Alunos: João Gomes e Valéria Faccin
+Alunos: João Vitor Gomes da Silva e Valéria Faccin
 =============================================================================================================================================
 
 Foi implementado uma navegação entre histórico de comandos.
@@ -17,6 +17,19 @@ Implementado um cabeçalho para cada tupla de 1 + n bytes (n sendo o número de 
 	o primeiro byte indica se a dupla foi deletada ou não (1 para deletada)
 	os n bytes seguintes indicam se a coluna é nulla, seguindo a ordem de criação da tabela
 
+Implementado o comando DELETE com suporte a verificação de integridade referencial utilizando índices B+ para chaves primárias (PK) e estrangeiras (FK).
+
+	DELETE FROM <tabela>
+
+Antes da exclusão de cada tupla, é realizada a construção da árvore B+ referente às chaves primárias das tabelas relacionadas, 
+garantindo que a tupla a ser removida não esteja sendo referenciada por outra tabela via chave estrangeira. 
+Caso haja referência, a exclusão é abortada para não deixar tuplas órfãs.
+
+O comando percorre as páginas de dados em buffer, marca as tuplas como deletadas e persiste as alterações em disco. 
+A exclusão respeita a estrutura do índice B+ para manter a consistência dos dados e permitir que consultas futuras continuem utilizando o índice corretamente.
+
+Alterações relacionadas:
+    -> INSERT: valida PK e FK via B+.
 
 
 ##############LEIA-ME PARTE 5 #############################################################################################################

@@ -535,7 +535,7 @@ tp_table* verificaIntegridade(char *nTabela){
     strcat(directory, "fs_schema.dat");
 
     if((fp = fopen(directory,"r")) == NULL) {
-        return (tp_table *)ERRO_ABRIR_ARQUIVO; // TODO: GOMES VAI RESOLVER
+        return (tp_table *)ERRO_ABRIR_ARQUIVO;
     }
 
      while((fgetc (fp) != EOF)){
@@ -548,7 +548,7 @@ tp_table* verificaIntegridade(char *nTabela){
         fread(&esquema.chave, sizeof(int), 1, fp);
         fread(&esquema.tabelaApt, TAMANHO_NOME_TABELA, 1, fp);
         fread(&esquema.attApt, TAMANHO_NOME_CAMPO, 1, fp);
-        if(!strncmp(nTabela, esquema.tabelaApt, 20) && esquema.chave == FK){
+        if(esquema.chave == FK && !strncmp(nTabela, esquema.tabelaApt, 20)){
             tp_table *e = (tp_table *)malloc(sizeof(tp_table));
             memcpy(e, &esquema, sizeof(tp_table));
             e->next = fkColumns;
@@ -559,10 +559,15 @@ tp_table* verificaIntegridade(char *nTabela){
     return fkColumns;
 }
 
-nodo *buildBplusForPK(tp_table *filho) { //TODO: RENOMEAR FUNÇÃO
+/** TODO (constroi_bplus): há um bug nessa função que não constrói corretamente a árvore,
+ * adicionando tuplas não referenciadas na árvore,
+ * influenciando na verificação de integridade do DELETE que irá rejeitar deletar essa tupla mesmo ela não sendo referenciada */
+nodo *buildBplusForPK(tp_table *filho) {
     struct fs_objects tabela = leObjetoById(filho->id);
-    char *pkFileName = (char *)malloc(TAMANHO_NOME_INDICE);
-    pkFileName = strcat(tabela.nome, filho->nome);
+    char *pkFileName = (char *)malloc(strlen(connected.db_directory) + TAMANHO_NOME_INDICE + 1);
+    pkFileName = strncpy(pkFileName, connected.db_directory, TAMANHO_NOME_INDICE);
+    pkFileName = strncat(pkFileName, tabela.nome, TAMANHO_NOME_INDICE);
+    pkFileName = strncat(pkFileName, filho->nome, TAMANHO_NOME_INDICE);
     return constroi_bplus(pkFileName);
 }
 

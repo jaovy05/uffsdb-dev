@@ -9,7 +9,7 @@ typedef struct nodo{
 	struct nodo *pai, *prox, *ant;
 	struct nodo **filhos;
 	int quant_data;
-} nodo; //TODO: PASSAR PRA TYPES
+} nodo;
 
 /* Cria novo nodo vazio e retorna-o. */
 nodo* criaNodo();

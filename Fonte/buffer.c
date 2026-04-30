@@ -13,6 +13,7 @@
 
 #include "misc.h"
 #include "dictionary.h"
+#include "buffer.h"
 
 static int isDeleted(char *linha);
 
@@ -60,6 +61,23 @@ tp_buffer *getBlock(unsigned int id, char* filename){
     tp_buffer* buffer = uffslloc(sizeof(tp_buffer));
     fread(buffer, sizeof(tp_buffer), 1, fd);
     return buffer;
+}
+
+int copyPage(tp_buffer *src, tp_buffer *dest, int tamTupla, int start){
+    // todo: olhar a performance
+    for (size_t i = start; i < src->position; i+=tamTupla){
+        if(dest->position + tamTupla > SIZE) /*[[unlikely]] */{
+            return i;
+        }
+
+        if(!isDeleted(src->data + i)) {
+            memcpy(dest->data + dest->position, src->data + i, tamTupla);
+            dest->position += tamTupla;
+            dest->nrec++;
+           
+        }
+    }
+    return COPIA_COMPLETA;
 }
 
 // RETORNA PAGINA DO BUFFER

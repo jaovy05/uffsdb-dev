@@ -14,6 +14,7 @@
 #define OP_CREATE_INDEX     7
 #define OP_DELETE           8
 #define OP_UPDATE           9
+#define OP_VACUUM           10
 
 #ifndef FCOMMANDHANDLER
    #include "commandHandler.h"

@@ -1,4 +1,4 @@
-#define FBUFFER 1 // flag controlar os includes
+#pragma once
 
 #ifndef FMACROS // garante que macros.h não seja reincluída
    #include "macros.h"
@@ -7,6 +7,8 @@
 #ifndef FTYPES // garante que types.h não seja reincluída
   #include "types.h"
 #endif
+
+#define COPIA_COMPLETA 0
 
 /*
     Esta função imprime todos os dados carregados numa determinada página do buffer
@@ -73,3 +75,5 @@ void cria_campo(int , int , char *, int );
 int writeBufferToDisk(tp_buffer *bufferpool, struct fs_objects *objeto);
 
 void addColumn(column **colList, column *c);
+
+int copyPage(tp_buffer *src, tp_buffer *dest, int tamTupla, int start);

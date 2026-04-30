@@ -85,6 +85,16 @@ void *uffsRealloc(void *ptr, size_t newSize) {
     return newPtr;
 }
 
+void *uffsArena(){
+    void *mem = malloc(100 * sizeof(tp_buffer));
+    if(!mem) {
+        printf("Memory allocation failed for new arena\n");
+        return NULL;
+    }
+
+    return mem;
+}
+
 void destroyMemoryContext() {
     if (root.temporary) {
         uffsFreeRecursive(root.temporary);

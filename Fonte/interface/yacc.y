@@ -50,12 +50,12 @@ int yywrap() {
         CLEAR       CONTR       WHERE       OPERADOR    RELACIONAL
         LOGICO      ASTERISCO   SINAL       FECHA_P     ABRE_P
         STRING      INDEX       ON          IMPLEMENT   HISTORY 
-        DELETE      DELETE_HISTORY  UPDATE  SET;
+        DELETE      DELETE_HISTORY  UPDATE  SET         VACUUM;
 %%
 start: insert | select | delete | update | create_table | create_database | drop_table | drop_database
      | table_attr | list_tables | connection | exit_program | semicolon {GLOBAL_PARSER.consoleFlag = 1; return 0;}
      | help_pls | list_databases | clear | contributors | create_index | history_pls | delete_history_pls
-     | qualquer_coisa | implement | /*epsilon*/;
+     | qualquer_coisa | implement | vacuum | /*epsilon*/;
 
 
 /*--------------------------------------------------*/
@@ -247,6 +247,9 @@ update_assignment: OBJECT {adcUpdateColumn(yylval.strval);}
 update_value: VALUE {adcUpdateValue(yylval.strval);}
             | NUMBER {adcUpdateValue(yylval.strval);}
             | STRING {adcUpdateValue(yylval.strval);};
+
+/* VACUUM */
+vacuum: VACUUM {setMode(OP_VACUUM); resetQuery();} table_query semicolon {return 0;};
 
 /* END */
 %%

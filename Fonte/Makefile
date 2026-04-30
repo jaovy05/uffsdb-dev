@@ -7,7 +7,7 @@ debug: interface/y.tab.c interface/y.tab.h interface/lex.yy.c *.c *.h
 	gcc -DDEBUG *.c $(CFLAGS) interface/*.c $(LDLIBS) -o uffsdb
 
 uffsdb: interface/y.tab.c interface/y.tab.h interface/lex.yy.c *.c *.h
-	gcc *.c $(CFLAGS) interface/*.c $(LDLIBS) -o uffsdb
+	gcc *.c $(CFLAGS) interface/*.c $(LDLIBS) -o uffsdb -std=gnu17
 
 interface/y.tab.c interface/y.tab.h: interface/lex.l interface/yacc.y
 	lex -o interface/lex.yy.c interface/lex.l

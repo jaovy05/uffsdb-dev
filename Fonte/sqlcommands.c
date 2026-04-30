@@ -1,9 +1,13 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
 #include "memoryContext.h"
 #include <ctype.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <linux/falloc.h>
 
 #ifndef FBTREE // includes only if this flag is not defined (preventing duplication)
    #include "btree.h"
@@ -560,7 +564,7 @@ int finalizaInsert(char *nome, column *c, int tamTupla){
     DEBUG_PRINT("INSERT - Tuple size written in file: %d", tamTupla);
     fseek(dados, buffer->id * sizeof(tp_buffer), SEEK_SET);
     fwrite(buffer, sizeof(tp_buffer), 1, dados);
-    DEBUG_PRINT("INSERT - Block size written in file: %d",  sizeof(tp_buffer));
+    DEBUG_PRINT("INSERT - Block size written in file: %ld",  sizeof(tp_buffer));
 
     fim: //label para liberar a memória utilizada e fechar o arquivo de dados
         fclose(dados);
@@ -1483,4 +1487,60 @@ void createIndex(rc_insert *t) {
   printf("CREATE INDEX\n");
 }
 
+void op_vacuum(inf_query* query){
+    if(!verificaNomeTabela(query->tabela)){
+        printf("\nERROR: relation \"%s\" was not found.\n\n\n", query->tabela);
+        return;
+    }
+    struct fs_objects objeto = leObjeto(query->tabela);
+    tp_table *esquema = leSchema(objeto);
+    int tupleSize = tamTupla(esquema, objeto);
+
+    char directory[LEN_DB_NAME_IO];
+    strcpy(directory, connected.db_directory);
+    strcat(directory, objeto.nArquivo);
+
+    char tempTable[LEN_DB_NAME_IO + 4];
+    memcpy(tempTable, directory, TAMANHO_NOME_TABELA);
+    strcat(tempTable,".bkp");
+
+
+    int fileW = open(tempTable, O_WRONLY | O_CREAT, 0666);
+    if (fallocate(fileW, 0, 0, objeto.lastBuffer * sizeof(tp_buffer)) == -1){
+        // TODO: TROCAR A MENSAGEM DIRETO
+        printf("deu paia ein piazão");
+        return ;
+    }
+
+    uint32_t indiceWrite = 0;
+    tp_buffer *pageWrite = initBuffer(indiceWrite);
+    // se fosse multi-usuario deveria bloquear as paginas antes
+    int start = 0;
+    for (uint32_t i = 0; i < objeto.lastBuffer; i++){
+        tp_buffer *pageRead = getBlock(i, directory);
+        if ((start =copyPage(pageRead, pageWrite, tupleSize, start)) != COPIA_COMPLETA){
+            DEBUG_PRINT("leitura até a page %u copiada para %u", i, indiceWrite);
+            write(fileW, pageWrite, sizeof(tp_buffer));
+            pageWrite = initBuffer(++indiceWrite);
+        } 
+        
+    }
+
+    write(fileW, pageWrite, sizeof(tp_buffer));
+    loff_t fileSize = (loff_t)(indiceWrite + 1) * sizeof(tp_buffer);
+    if (ftruncate64(fileW, fileSize)==-1){
+        printf("Erro ao truncar arquivo\n");
+        return;
+    }    
+    fsync(fileW); // sincroniza com o disco
+    close(fileW);
+    
+    if (rename(tempTable, directory) != 0) {
+        printf("Erro ao renomear arquivo de tabela\n");
+        return;
+    }
+
+    objeto.lastBuffer = indiceWrite;
+    updateSchema(&objeto);
+}
 ///////

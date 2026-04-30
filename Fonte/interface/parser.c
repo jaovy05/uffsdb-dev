@@ -355,6 +355,9 @@ int interface() {
                         case OP_CREATE_INDEX:
                             createIndex(&GLOBAL_DATA);
                             break;
+                        case OP_VACUUM:
+                            op_vacuum(&QUERY);
+                            break;
                         default: break;
                     }
 

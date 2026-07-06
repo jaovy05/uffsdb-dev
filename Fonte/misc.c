@@ -13,8 +13,8 @@
   #include "types.h"
 #endif
 
-#ifndef FBUFFER // garante que buffer.h não seja reincluída
-  #include "buffer.h"
+#ifndef FBUFFER // garante que legacybuffer.h não seja reincluída
+  #include "legacybuffer.h"
 #endif
 
 #ifndef FDICTIONARY // the same
@@ -32,7 +32,7 @@ int cabecalho(tp_table *s, int num_reg) {
     return aux;
 }
 ///////
-int drawline(tp_buffer *buffpoll, tp_table *s, struct fs_objects objeto, int p, int num_page) {
+int drawline(tp_page *buffpoll, tp_table *s, struct fs_objects objeto, int p, int num_page) {
 
     if (num_page > PAGES || p > SIZE) {
         return ERRO_DE_PARAMETRO;

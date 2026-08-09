@@ -3,14 +3,8 @@
 #include <string.h>
 #include "memoryContext.h"
 
-#ifndef FMACROS // garante que macros.h não seja reincluída
 #include "macros.h"
-#endif
-///
-#ifndef FTYPES // garante que types.h não seja reincluída
 #include "types.h"
-#endif
-
 #include "misc.h"
 #include "dictionary.h"
 #include "bufferManager.h"

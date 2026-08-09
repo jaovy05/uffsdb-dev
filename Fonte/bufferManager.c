@@ -2,28 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef FMACROS
 #include "macros.h"
-#endif
-
-#ifndef FTYPES
 #include "types.h"
-#endif
-
-#ifndef FDICTIONARY
 #include "dictionary.h"
-#endif
-
 #include "buffer.h"
 #include "bufferManager.h"
 
-static int pagina_da_vez_para_sair = 0; // variável que vai guardar o índice da página pra expulsão de página em relógio no buffer pool. começo com 0 pq a primeira página a ser escrita é a 0. Só entra em ação quando buffer está cheio ou usuário faz exit
-
+static int pagina_da_vez_para_sair = 0; // variável que vai guardar o índice da página pra expulsão de página em relógio no buffer pool. 
 static int indice_pagina_para_subtituir; // variável que guarda para bm_novaPaginaNoBuffer o indice da nova página do buffer pool para ser usada (página reiniciada)
 
-// intermediário para o getBlock (testei os comandos (insert, delete...) e funcionou normalmente. As impressões que dizem se o bloco está ou não no buffer parecem funcionar. Mas não criei uma função de imprimir o buffer pra conferir o buffer)
-// verifica se o bloco id_bloco da tabela id_tabela já está no buffer. Se estiver, retorna um ponteiro para ele. Se não estiver, lê o bloco do disco com getBlock, copia para o primeiro slot livre do buffer, atualiza o header dele e retorna um ponteiro para esse slot
-// daí agora todo lugar que chama getBlock() tem que passar a chamar bm_getBlock, imagino eu
+// intermediário para o getBlock (testei os comandos (insert, delete...)
 tp_pagina *bm_getBlock(int id_tabela, int id_bloco, char *filename)
 {
 

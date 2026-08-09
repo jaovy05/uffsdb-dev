@@ -1,4 +1,6 @@
-#define BLOCK_SIZE 16384 // limite em bytes do tamanho do blocos
+#pragma once
+
+#define BLOCK_SIZE 8192 // limite em bytes do tamanho do blocos
 #define FMACROS 0        // flag para identificar se macros.h já foi incluída
 // TRATAMENTO DE ERROS
 // ERROS inteiros

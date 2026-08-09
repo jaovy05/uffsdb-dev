@@ -5,8 +5,6 @@
 #include <stdint.h>
 #include "macros.h"
 
-#define FTYPES 1 // flag para identificar se types.h já foi incluída
-
 // isso é um registro da TABELA
 struct fs_objects
 {                                        // Estrutura usada para carregar fs_objects.dat

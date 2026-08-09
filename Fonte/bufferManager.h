@@ -1,12 +1,7 @@
-#define FBUFFERMANAGER 1
+#pragma once
 
-#ifndef FMACROS
 #include "macros.h"
-#endif
-
-#ifndef FTYPES
 #include "types.h"
-#endif
 
 tp_pagina *bm_writeBufferToDisk();
 

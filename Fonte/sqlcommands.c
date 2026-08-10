@@ -671,7 +671,7 @@ int finalizaInsert(char *nome, column *c, int tamTupla)
     printf("id=%u\n", buffer->id);
     printf("nrec=%u\n", buffer->nrec);
     printf("position=%u\n", buffer->position);*/
-
+    
     print_tabela_bloco(pagina, auxT, objeto, pagina->id); // para teste
 
 fim: // label para liberar a memória utilizada e fechar o arquivo de dados

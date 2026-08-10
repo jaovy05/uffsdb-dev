@@ -3,6 +3,9 @@
 #include "macros.h"
 #include "types.h"
 
+#define HASHNULL -1
+#define HASHDELETED -2
+
 tp_pagina *bm_writeBufferToDisk();
 
 // verifica se o bloco id_bloco da tabela id_tabela já tá no buffer
